@@ -6,7 +6,7 @@ float brute_A (float y0, float xl0, float gama, float X, float vex, float vey, f
 
     result = (2*xl0)/w - 3*y0 + ((2*vex)/w) * log((X+1)/X);
 
-    //Calculo do somatorio
+    // Calculo do somatorio
     for (int n = 1; n <= 20; n++) {
         aux = (1/(n*pow(X, n)))*(1/(1+(n*gama_w)*(n*gama_w)))*((vex2_w)+(n*gamavey_ww));
         if (n%2 == 0) {//iteracao par
@@ -36,6 +36,7 @@ float brute_B (float yl0, float X, float vey, float gamavex_ww, float gama_wpow,
     }
 
     result+= sum;
+    
     return result;
 }
 
@@ -113,7 +114,7 @@ __kernel void main(__global float* a, __global float* b, __global float* c)
     float gama_wpow;
     float A = 0.0f, B = 0.0f, E = 0.0f, G = 0.0f;
     float VeReal = 0.0f;
-    float response = 5.0f;
+    float response = 0.0f;
     //------------------------------------------
     c[0] = get_global_size(0);
     c[1] = get_global_size(1);
@@ -136,7 +137,7 @@ __kernel void main(__global float* a, __global float* b, __global float* c)
         E = brute_E (a[1], a[2], X+1, vex, w);
         G = brute_G (a[0], a[3], X+1, vex, vey, w);
         for(int t = 0; t < 86400; t++) {
-            if (t == 5 && Ve == 5.0f && X == 55.0f && expGama == 16.0f) {
+            if (t == 100 && Ve == 0 && X == 0 && expGama == 0) {
                 response = dX(t, vex, gama, X+1, A, B, E, G, vey2_w, gama_wpow, w);
             } else {
                 dX(t, vex, gama, X+1, A, B, E, G, vey2_w, gama_wpow, w);
@@ -145,10 +146,11 @@ __kernel void main(__global float* a, __global float* b, __global float* c)
         
         if(Ve == 5 && X == 56 && expGama == 16) {
             c[7] = 0.0f;
-        } else if(Ve == 5 && X == 54 && expGama == 16) {
-            c[8] = 0.0f;
-        } else if(Ve == 5 && X == 55 && expGama == 16) {
+        } else if(Ve == 0 && X == 0 && expGama == 0) {
+            c[8] = A;
             c[9] = response;
-        }
+        }/* else if(Ve == 0 && X == 0 && expGama == 0) {
+            c[9] = response;
+        }*/
     }
 }

@@ -1,22 +1,21 @@
-    #include <stdio.h>
-    #include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
      
-    #ifdef __APPLE__
-    #include <OpenCL/opencl.h>
-    #else
-    #include <CL/cl.h>
-    #endif
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
      
-    #define MAX_SOURCE_SIZE (0x100000)
-    #define LENGTH (100)
-    #define X (100)
-    #define gama (17)
-    #define Ve (10)
+#define MAX_SOURCE_SIZE (0x100000)
+#define LENGTH (100)
+#define X (100)
+#define gama (17)
+#define Ve (10)
     
-    float x=0, y=0, xl0=0, yl0=0;
+float x=0, y=0, xl0=0, yl0=0;
      
-    int main()
-    {
+int main(int argc, char *argv[]) {
     cl_device_id device_id = NULL;
     cl_context context = NULL;
     cl_command_queue command_queue = NULL;
@@ -89,11 +88,20 @@
     char url[] = "in.dat";
     arq = fopen(url, "r");
     float var1;
+    int NPI; // numero de posicoes iniciais
 	float done = 0; // usada para mostrar o percentual calculado
+    
+	if (argv[1] != NULL && atoi(argv[1]) >= 1) {
+		NPI = atoi(argv[1]);
+		printf("Calculando para %d posicoes iniciais.\n", NPI);
+	} else {
+		NPI = 1;
+		printf("Calculando para 1 posicao inicial.\n");
+	}
 
-	/*printf("0%c concluido\r", 37);
-	fflush(stdout);*/
-    int NPI = 5;
+	printf("0%c concluido\r", 37);
+	fflush(stdout);
+	
     for(int np = 1; np <= NPI; np++) {
         
         if(arq == NULL) {
@@ -110,14 +118,12 @@
 
         // Write a and b vectors into compute device memory
         ret = clEnqueueWriteBuffer(command_queue, d_a, CL_TRUE, 0, sizeof(float) * LENGTH, h_a, 0, NULL, NULL);
-        if (ret != CL_SUCCESS)
-        {
+        if (ret != CL_SUCCESS) {
             printf("Error: 1! %d\n", ret);
             exit(1);
         }
         ret = clEnqueueWriteBuffer(command_queue, d_b, CL_TRUE, 0, sizeof(float) * LENGTH, h_b, 0, NULL, NULL);
-        if (ret != CL_SUCCESS)
-        {
+        if (ret != CL_SUCCESS) {
             printf("Error: 2! %d\n", ret);
             exit(1);
         }
@@ -135,8 +141,7 @@
         size_t global[3] = {10, 100, 17};
         //ret = clEnqueueTask(command_queue, kernel, 0, NULL,NULL);
         ret = clEnqueueNDRangeKernel(command_queue, kernel, 3, NULL, global, NULL, 0, NULL, NULL);
-        if (ret != CL_SUCCESS)
-        {
+        if (ret != CL_SUCCESS) {
             printf("Error: Failed to EnqueueNDRangeKernel! %d\n", ret);
             exit(1);
         }
@@ -144,19 +149,24 @@
         /* Copy results from the memory buffer */
         //ret = clEnqueueReadBuffer(command_queue, d_c, CL_TRUE, 0, MEM_SIZE * sizeof(char), h_c, 0, NULL, NULL);
         ret = clEnqueueReadBuffer(command_queue, d_c, CL_TRUE, 0, sizeof(float) * LENGTH, h_c, 0, NULL, NULL);
-        if (ret != CL_SUCCESS)
-        {
+        if (ret != CL_SUCCESS) {
             printf("Error: Failed to read output array! %d\n", ret);
             exit(1);
         }
         
         /* Display Results */        
-        for(int t = 0; t < 10; t++) {
+        /*for(int t = 0; t < 10; t++) {
             printf("%f\n", h_c[t]);
+        }*/
+        done = 100*np/NPI;
+        if (done < 100) {
+            printf("%.2f%c concluido\r", done, 37);
+        } else {
+            printf("%.2f%c concluido\n", done, 37);
         }
-        printf("--------------------------------------\n");
+        fflush(stdout);
     }
-     
+    
     /* Finalization */
     ret = clFlush(command_queue);
     ret = clFinish(command_queue);
@@ -174,4 +184,4 @@
     free(h_c);
      
     return 0;
-    }
+}
