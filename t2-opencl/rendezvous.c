@@ -154,7 +154,8 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
         
-        /* Display Results */        
+        /* Display Results */
+        printf("VALOR AMOSTRA: %f\n", h_c[9]);
         /*for(int t = 0; t < 10; t++) {
             printf("%f\n", h_c[t]);
         }*/

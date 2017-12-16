@@ -17,11 +17,31 @@ int main(int argc, char** argv) {
     char processor_name[MPI_MAX_PROCESSOR_NAME];
     int name_len;
     MPI_Get_processor_name(processor_name, &name_len);
-
+    
+    int min, max;
+    if (world_rank == 0) {
+        min = 1;
+        max = 25;
+    } else if (world_rank == 1) {
+        min = 26;
+        max = 50;
+    } else if (world_rank == 2) {
+        min = 51;
+        max = 75;
+    } else if (world_rank == 3) {
+        min = 76;
+        max = 100;
+    }
+    
+    for (int X=min; X<=max; X++) {
     // Print off a hello world message
-    printf("Hello world from processor %s, rank %d"
-           " out of %d processors\n",
-           processor_name, world_rank, world_size);
+    printf("Printing from processor %s, rank %d out of %d processors, calculating for X %d\n", processor_name, world_rank, world_size, X);
+        for(float Ve = 0.5f; Ve<=5.0f; Ve += 0.5f) {
+            for(int expGama = -14;  expGama<=2; expGama++) {
+                
+            }
+        }
+    }
 
     // Finalize the MPI environment.
     MPI_Finalize();

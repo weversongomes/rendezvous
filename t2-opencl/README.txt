@@ -4,4 +4,4 @@ Como compilar
 nvcc -ccbin clang-3.8 rendezvous.c -o rendezvous -Wno-deprecated-gpu-targets -lm -lOpenCL
 
 Como executar
-optirun ./rendezvous N
+time optirun ./rendezvous N

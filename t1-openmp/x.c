@@ -61,11 +61,11 @@ int main(int argc, char *argv[]) {
 	int NT;
 	if (argv[2] != NULL && atoi(argv[2]) >= 1) {
 		NT = atoi(argv[2]);
-		omp_set_num_threads(NT);
+		//omp_set_num_threads(NT);
 		printf("Utilizando %d nucleos.\n", NT);
 	} else {
 		NT = 1;
-		omp_set_num_threads(1);
+		//omp_set_num_threads(1);
 		printf("Utilizando 1 nucleo.\n");
 	}
     FILE *arq;
@@ -143,6 +143,9 @@ int main(int argc, char *argv[]) {
                     for(int t = 0; t <= Tmax; t++) {
 						// calculando valores para o eixo X da distancia relativa
 						dX(t, vey, vex, gama, X, A, B, E, G, vey2_w, vex4, gama_wpow);
+                        if (t == 0 && Ve == 0.5 && Xaux == 1 && aux == 2) {
+                            printf("VALOR AMOSTRA: %lf\n", dX(t, vey, vex, gama, X, A, B, E, G, vey2_w, vex4, gama_wpow));
+                        }
                     }
                 }
 				done = done + (0.588235294 / NPI);

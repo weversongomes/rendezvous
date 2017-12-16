@@ -137,8 +137,9 @@ __kernel void main(__global float* a, __global float* b, __global float* c)
         E = brute_E (a[1], a[2], X+1, vex, w);
         G = brute_G (a[0], a[3], X+1, vex, vey, w);
         for(int t = 0; t < 86400; t++) {
-            if (t == 100 && Ve == 0 && X == 0 && expGama == 0) {
-                response = dX(t, vex, gama, X+1, A, B, E, G, vey2_w, gama_wpow, w);
+            if (t == 0 && Ve == 0 && X == 0 && expGama == 16) {
+                c[9] = dX(t, vex, gama, X+1, A, B, E, G, vey2_w, gama_wpow, w);
+                printf("Printing from GPU\n");
             } else {
                 dX(t, vex, gama, X+1, A, B, E, G, vey2_w, gama_wpow, w);
             }
@@ -148,9 +149,6 @@ __kernel void main(__global float* a, __global float* b, __global float* c)
             c[7] = 0.0f;
         } else if(Ve == 0 && X == 0 && expGama == 0) {
             c[8] = A;
-            c[9] = response;
-        }/* else if(Ve == 0 && X == 0 && expGama == 0) {
-            c[9] = response;
-        }*/
+        }
     }
 }
