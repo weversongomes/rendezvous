@@ -16,7 +16,7 @@ double vZ(int t, double X, double gama,  double vez, double H, double I, double 
 double rT(double fx, double fy, double fz);
 double vT(double dx, double dy, double dz);
 
-double dX (int t, double vey, double vex, double gama, double X, double A, double B, double E, double G, double vey2_w, double vex4, double gama_wpow);
+double dX (int t, double vex, double gama, double X, double A, double B, double E, double G, double vey2_w, double gama_wpow);
 double dY (int t, double vex, double vey, double gama, double X, double A, double B, double D, double gamavey_ww, double gama_wpow);
 double dZ (int t, double X, double gama, double vez, double G, double H, double I, double gama_wpow);
 
@@ -142,10 +142,10 @@ int main(int argc, char *argv[]) {
                     //#pragma omp parallel for
                     for(int t = 0; t <= Tmax; t++) {
 						// calculando valores para o eixo X da distancia relativa
-						dX(t, vey, vex, gama, X, A, B, E, G, vey2_w, vex4, gama_wpow);
-                        if (t == 0 && Ve == 0.5 && Xaux == 1 && aux == 2) {
+						dX(t, vex, gama, X, A, B, E, G, vey2_w, gama_wpow);
+                        /*if (t == 0 && Ve == 0.5 && Xaux == 1 && aux == -14) {
                             printf("VALOR AMOSTRA: %lf\n", dX(t, vey, vex, gama, X, A, B, E, G, vey2_w, vex4, gama_wpow));
-                        }
+                        }*/
                     }
                 }
 				done = done + (0.588235294 / NPI);
@@ -197,7 +197,6 @@ double brute_A (double y0, double xl0, double gama, double X, double vex, double
     //Calculo do somatorio
     //#pragma omp parallel for reduction(+:sum) private(aux)
     for (int n = 1; n <= N; n++) {
-        //aux = (1/(n*pow(X, n)))*(1/(1+((n*gama)/w)*((n*gama)/w)))*(((2*vex)/w)+((n*gama*vey)/(w*w)));
         aux = (1/(n*pow(X, n)))*(1/(1+(n*gama_w)*(n*gama_w)))*((vex2_w)+(n*gamavey_ww));
         if (n%2 == 0) {//iteraÃ§Ã£o Par
             aux = -aux;
@@ -241,7 +240,6 @@ double brute_B (double yl0,  double gama, double X, double vex, double vey, doub
     //Calculo do somatorio
     //#pragma omp parallel for reduction(+:sum) private(aux)
     for (int n = 1; n <= N; n++) {
- //     aux = (1/(n*pow(X,n)))*(1/(1+pow(((n*gama)/w),2)))*(vey/w + (n*gama*vex)/(ww));
         aux = (1/(n*pow(X,n)))*(1/(1+(n*n*gama_wpow)))*(vey_w + (n*gamavex_ww));
         if (n%2 == 0) {//iteraÃ§Ã£o Par
             aux = -aux;
@@ -428,10 +426,9 @@ double brute_I (double zl0, double gama, double X, double vez, double gama_wpow)
 /* @author Weverson, Iago
  * vetor X da distancia
  */
-double dX (int t, double vey, double vex, double gama, double X, double A, double B, double E, double G, double vey2_w, double vex4, double gama_wpow) {
+double dX (int t, double vex, double gama, double X, double A, double B, double E, double G, double vey2_w, double gama_wpow) {
     //otimizacao
     double wt = w*t;
-    double gamat = gama*t;
 
     double resultFn = 0;
     double result1 = 2 * (A*sin(wt)-B*cos(wt))+E*t;
@@ -440,7 +437,7 @@ double dX (int t, double vey, double vex, double gama, double X, double A, doubl
     //#pragma omp parallel for reduction(+:result2)
     for (int n = 1; n <= N; n++) {
         // brute_F
-        resultFn = (1/(n*pow(X,n)))*(vey2_w + vex4/(n*gama))/(1+(n*n*gama_wpow));
+        resultFn = (1/(n*pow(X,n)))*(vey2_w + vex*4/(n*gama))/(1+(n*n*gama_wpow));
 
         if (n%2 == 0) {
             resultFn = - resultFn;
@@ -448,7 +445,7 @@ double dX (int t, double vey, double vex, double gama, double X, double A, doubl
         resultFn -= vex/(n*gama);
         //brute_F
 
-        result2 += resultFn * pow(M_E, -(n * gamat));
+        result2 += resultFn * pow(M_E, -(n * gama * t));
     }
     return result1 + result2;
 }
